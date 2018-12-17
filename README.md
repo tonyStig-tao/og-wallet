@@ -1,4 +1,4 @@
-# my-project
+# og-wallet
 
 > An electron-vue project
 
