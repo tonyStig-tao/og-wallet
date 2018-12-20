@@ -2,7 +2,7 @@ var sqlite3 = require('sqlite3').verbose()
 var Promise = require('bluebird')
 // eslint-disable-next-line no-path-concat
 var db = new sqlite3.Database(__dirname + '/usrDB', function (data) {
-  console.log(data)
+  // console.log(data)
 })
 
 var responseObj = {

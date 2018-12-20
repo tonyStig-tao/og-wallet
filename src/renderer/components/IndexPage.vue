@@ -4,39 +4,49 @@
     <main v-if="isRouterAlive">
       <div class="left-side">
         <span class="title">
-          Welcome to OG wallet!
+          Welcome to Ola!
         </span>
-        <system-information></system-information>
+        <!-- <system-information></system-information> -->
       </div>
-
       <div class="right-side">
         <div class="doc">
           <div class="title">Getting Started</div>
           <p>
-            here is Introduction. here is Introduction. here is Introduction. here is Introduction. here is Introduction.
-            here is Introduction. here is Introduction. here is Introduction. here is Introduction. here is Introduction.
+            Ola 1.11 Beta is here: a faster, simple OG client. This huge update to OG allows you to create encrypted contracts and transactions on-chain. 
           </p>
-          <el-button type="success" @click="goCreatAccount">creat account</el-button>
-          <el-button type="success" @click="goImportAccount">Import account</el-button>
+          <el-button type="success" @click="goCreatAccount"  icon="el-icon-plus" round style="margin-top: 10px">creat account</el-button>
+          <el-button type="success" @click="goImportAccount" icon="el-icon-download" round style="margin-top: 10px">Import account</el-button>
         </div>
-        <div class="doc">
+        <div class="doc" style="margin-top: 20px">
           <div class="title alt">Other Documentation</div>
-          <el-button type="success" plain @click="open('http://www.annchain.io/')">website</el-button>
-          <el-button type="success" plain @click="open('https://github.com/annchain/OG')">github</el-button>
+          <el-button type="success" icon="icon iconfont icon-web" plain @click="open('http://www.annchain.io/')"> website</el-button>
+          <el-button type="success" icon="icon iconfont icon-github1" plain @click="open('https://github.com/annchain/OG')"> github</el-button>
         </div>
       </div>
     </main>
     <div id="menu-icon">
-      <div>index <el-button type="success" icon="el-icon-info" @click="goAccount" circle></el-button></div>
+      <div>index <el-button type="success" icon="icon iconfont icon-caidan1" @click="goAccount" circle></el-button></div>
     </div>
   </div>
 </template>
 
 <script>
   import SystemInformation from './IndexPage/SystemInformation'
+  // import C from '../js/common.js'
+  import sqlite from '../db/db.js'
+
+  var initPage = function () {
+    sqlite.query('SELECT * FROM usr').then(function (data) {
+      // console.log(data)
+    })
+  }
+  // initPage()
 
   export default {
     name: 'index-page',
+    created: function () {
+      initPage()
+    },
     data () {
       return {
         isRouterAlive: true
@@ -132,7 +142,13 @@
 
   .title.alt {
     font-size: 18px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+  }
+
+  .title.alt.small {
+    font-size: 14px;
+    margin-bottom: 5px;
+    font-weight: normal;
   }
 
   .doc p {
