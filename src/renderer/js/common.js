@@ -18,19 +18,37 @@ C.creatAccount = function () {
   return og.newAccount()
 }
 
+C.getBalance = function (addr) {
+  return og.getBalance(addr)
+}
+
 C.getRecoverPhrase = function (data) {
   return bip39.entropyToMnemonic(data)
 }
 
+C.recoverPrivate = function (data) {
+  return bip39.mnemonicToEntropy(data)
+}
+
+C.recoveryAccount = function (privateKey) {
+  return og.recoveryAccount(privateKey)
+}
+
 C.accountStorage = function (newAccount, newAccountOBJ) {
-  // eslint-disable-next-line no-undef
-  // var a = CryptoJS.AES.encrypt(newAccountOBJ.privateKey, newAccount.password)
-  // console.log(a)
-  return db.execute('INSERT INTO usr VALUES (?,?,?,?,?,?)', [newAccount.account_name, newAccount.account_hint, newAccountOBJ.address, newAccountOBJ.public, newAccountOBJ.public_raw, newAccountOBJ.privateKey])
+  return db.execute('INSERT INTO usr VALUES (?,?,?,?,?,?,?)', [newAccount.account_name, newAccount.account_hint, newAccountOBJ.address, newAccountOBJ.public, newAccountOBJ.public_raw, newAccountOBJ.privateKey, newAccount.balance])
 }
 
 C.deleteAccount = function (address) {
   return db.execute('DELETE FROM usr WHERE address == "' + address + '"')
+}
+
+C.checkAddress = function (address) {
+  var checkPoint = '0x'
+  if (address.slice(0, 2) === checkPoint && address.length === 42) {
+    return true
+  } else {
+    return false
+  }
 }
 
 C.encryptPrivKey = function (password, decpri) {
@@ -47,12 +65,48 @@ C.decryptPrivKey = function (password, encpri) {
   return CryptoJS.enc.Utf8.stringify(decrypt).toString()
 }
 
+C.getNonce = function (address) {
+  og.getNonce(address).then(function (data) {
+    return data
+  })
+}
+
+C.saveTransaction = function (tx, hash) {
+  var time = new Date().toString()
+  return db.execute('INSERT INTO txHistory VALUES (?,?,?,?,?,?)', [hash, tx.status, tx.from, tx.to, tx.amount, time])
+}
+
+C.getTxParams = function (cfrom, cto, cvalue, cpublicKey, cpublicKeyRaw, cnonce) {
+  var tx = {
+    from: cfrom,
+    to: cto,
+    value: cvalue,
+    publicKey: cpublicKey,
+    publicKey_raw: cpublicKeyRaw,
+    height: 10,
+    nonce: cnonce
+  }
+  return tx
+}
+
+C.genRawTransaction = function (txParams) {
+  return og.genRawTransaction(txParams)
+}
+
+C.signRawTransaction = function (signTarget, privateKey) {
+  return og.signRawTransaction(signTarget, privateKey).signature
+}
+
+C.makeUpTransaction = function (txParams, signature) {
+  return og.makeUpTransaction(txParams, signature)
+}
+
 C.layoutPDF = function (type, data) {
   // eslint-disable-next-line eqeqeq
   if (type === 'secp') {
     var docDefinition = { content: [
-      { text: 'CHORUS WALLET ACCOUNT BACKUP CARD', style: 'header' }, '\n', '\n',
-      { text: 'CHOE account:', style: 'header' }, '\n', '\n',
+      { text: 'OG ACCOUNT BACKUP CARD', style: 'header' }, '\n', '\n',
+      { text: 'OG account:', style: 'header' }, '\n', '\n',
       { text: 'address:', style: 'header' },
       data.address, '\n',
       { text: 'privKey:', style: 'header' },

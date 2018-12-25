@@ -1,6 +1,7 @@
 <template>
   <div id="accountWrapper" v-if="isRouterAlive">
-    <img id="logoSmall" src="~@/assets/logo.png" alt="electron-vue">
+    <!-- <img id="logoSmall" src="~@/assets/logo.png" alt="electron-vue"> -->
+    <img id="logoSmall" src="~@/assets/ann.png" alt="electron-vue">
       <transition name="el-fade-in-linear">
       <div id="accountButton" v-if="accountInfoShow">
         <el-button  type="success" @click="goTransaction(accountSelect)" icon="icon iconfont icon-business" round size="small"> TRANSACTION</el-button>
@@ -41,8 +42,8 @@
         <div class="title alt inCard">
           {{ account.address }}
         </div>
-        <div class="text item">
-          balance 
+        <div class="title alt">
+          balance : {{ account.balance_OG }} OG
         </div>
       </el-card>
     </main>
@@ -120,7 +121,7 @@
             </div>
             <el-input v-model="tx.password" placeholder="the account password" type="password"></el-input>
             <el-button id="signer-button-cancel" type="danger" @click="enterPassShow=false" icon="el-icon-close" plain style="margin-top: 20px;"> Cancel</el-button>
-            <el-button id="signer-button-confirm" type="success" @click="sendTransaction(tx)" icon="el-icon-check" style="margin-top: 20px;"> Confirm Requst</el-button>
+            <el-button id="signer-button-confirm" type="success" @click="sinerConfirm(tx)" icon="el-icon-check" style="margin-top: 20px;"> Confirm Requst</el-button>
           </el-dialog>
         </el-dialog>
       </div>
@@ -148,9 +149,9 @@
             <span class="title alt" style="margin-left: 10px;">{{ accountSelect.account_name }}</span>
             <div class="title alt inCard" style="margin-top: 10px;">{{ accountSelect.address }}</div>
 
-            <el-menu :default-active="activeIndex" active-text-color="#68c13a" class="el-menu-demo" mode="horizontal">
+            <el-menu :default-active="activeIndex" background-color="#f0f9eb" active-text-color="#68c13a" class="el-menu-demo" mode="horizontal">
               <el-menu-item @click="testPasswordShow=true;changePasswordShow=false" index="1">TEST PASSWORD</el-menu-item>
-              <el-menu-item @click="changePasswordShow=true;testPasswordShow=false" index="2"><a>CHANGE PASSWORD</a></el-menu-item>
+              <el-menu-item @click="changePasswordShow=true;testPasswordShow=false" index="2" disabled><a>CHANGE PASSWORD</a></el-menu-item>
             </el-menu>
 
             <div v-if="testPasswordShow">
@@ -270,6 +271,13 @@ import C from '../js/common.js'
 import sqlite from '../db/db.js'
 import QRCode from 'qrcode'
 import VueAvatar from '@lossendae/vue-avatar'
+import OG from 'og-sdk'
+
+var og = new OG()
+
+og.setProvider(
+  new OG.providers.HttpProvider('http://localhost:8000')
+)
 
 export default {
   name: 'account-page',
@@ -308,13 +316,14 @@ export default {
       password: {},
       visible: false,
       exportData: {},
-      transactionData: []
+      transactionData: [],
+      now_address: ''
     }
   },
   created: function () {
     sqlite.query('SELECT * FROM usr').then((data) => {
       this.accountList = data.data
-      console.log('here', this.accountList)
+      console.log(this.accountList)
     })
   },
   methods: {
@@ -328,7 +337,6 @@ export default {
       this.$router.push({ path: '/account' })
     },
     goTransaction (account) {
-      console.log(account)
       this.transactionFromShow = true
     },
     accountInfo (accountData) {
@@ -340,12 +348,79 @@ export default {
       sqlite.query(sql).then((data) => {
         console.log('accountInfo here', data)
         this.transactionData = data.data
+        return C.getBalance(this.accountSelect.address)
+      }).then((data) => {
+        this.balance = data.balance
+        var sql = 'UPDATE usr SET balance_OG = ' + this.balance + ' where address = ' + '"' + this.accountSelect.address + '"'
+        console.log(sql)
+        return sqlite.execute(sql)
       }).then().catch(function (err) {
         console.log('accountInfo err:', err)
       })
     },
-    sendTransaction (tx) {
-      console.log(tx)
+    sinerConfirm (tx) {
+      console.log('tx', tx)
+      console.log('accountSelect', this.accountSelect)
+      console.log(tx.password, this.accountSelect.privKey)
+      if (tx.password.length < 7) {
+        this.$message({
+          message: 'the passwords length must be more than 7',
+          type: 'error'
+        })
+      }
+      var decPri = C.decryptPrivKey(tx.password, this.accountSelect.privKey)
+      console.log(decPri)
+      if (decPri === '') {
+        console.log('err')
+        this.$message({
+          message: 'WRONG PASSWORD',
+          type: 'error'
+        })
+      } else {
+        console.log('in here')
+        console.log('accountSelect.address', this.accountSelect.address)
+        tx.from = this.accountSelect.address
+        tx.pubKey = this.accountSelect.pubKey
+        tx.pubKey_raw = this.accountSelect.pubKey_raw
+        og.getNonce(tx.from).then((data) => {
+          tx.nonce = data.nonce + 1
+          var txParams = C.getTxParams(tx.from, tx.to, tx.amount, tx.pubKey, tx.pubKey_raw, tx.nonce)
+          console.log('txParams', txParams)
+          var signTarget = C.genRawTransaction(txParams)
+          console.log('signTarget', signTarget)
+          console.log(decPri)
+          var signature = C.signRawTransaction(signTarget, decPri)
+          console.log('signature', signature)
+          var TX = C.makeUpTransaction(txParams, signature)
+          console.log('TX', TX)
+          return og.sendTransaction(TX)
+        }).then((data) => {
+          console.log(data)
+          var result = JSON.parse(data.body)
+          if (result.error) {
+            this.$notify.error({
+              title: 'transaction failed!',
+              message: result.error
+            })
+          } else {
+            this.$notify({
+              title: 'transaction sended!',
+              message: result.hash,
+              type: 'success'
+            })
+            this.transactionFromShow = false
+            this.enterPassShow = false
+            // save transaction
+            tx.status = 'pending'
+            C.saveTransaction(tx, result.hash)
+            // reload account page
+            var sql = 'SELECT * from txHistory where cFrom == "' + this.accountSelect.address + '"'
+            sqlite.query(sql).then((data) => {
+              this.transactionData = data.data
+            })
+          }
+        })
+      }
     },
     goImportAccount () {
       this.$router.push({ path: '/importAccount' })
@@ -357,6 +432,24 @@ export default {
     },
     editAccount (data) {
       console.log(data)
+      if (data.hint) {
+        var sql1 = 'UPDATE usr SET account_name = "' + data.name + '", account_hint = "' + data.hint + '" where address = ' + '"' + this.accountSelect.address + '"'
+        console.log(sql1)
+        sqlite.execute(sql1).then((data) => {
+          console.log(data)
+        })
+      } else {
+        var sql2 = 'UPDATE usr SET account_name = "' + data.name + '" where address = ' + '"' + this.accountSelect.address + '"'
+        console.log(sql2)
+        sqlite.execute(sql2).then((data) => {
+          console.log(data)
+        })
+        this.editFromShow = false
+        sqlite.query('SELECT * FROM usr where address = "' + this.accountSelect.address + '"').then((data) => {
+          console.log(data)
+          this.accountSelect.account_name = data.data[0].account_name
+        })
+      }
     },
     goPassword () {
       this.passwordFromShow = true
@@ -365,8 +458,9 @@ export default {
 
     },
     exportAccount () {
+      console.log(this.exportData.password, this.accountSelect.privKey)
       var a = C.decryptPrivKey(this.exportData.password, this.accountSelect.privKey)
-      // this.accountSelect.privKey = a
+      console.log(a)
       if (a === '') {
         console.log('err')
         this.$message({
@@ -378,7 +472,7 @@ export default {
         var data = {
           address: this.accountSelect.address,
           secp_privKey: a,
-          recoverPhrase: a
+          recoverPhrase: C.getRecoverPhrase(a)
         }
         C.layoutPDF(type, data)
         this.$notify({
@@ -386,10 +480,18 @@ export default {
           type: 'success',
           duration: 8000
         })
+        this.visible = false
       }
     },
     toEnterPass () {
-      this.enterPassShow = true
+      if (C.checkAddress(this.tx.to)) {
+        this.enterPassShow = true
+      } else {
+        this.$message({
+          message: 'Invalid format of recipient address. please check recipient address length and expect start with "0x"',
+          type: 'error'
+        })
+      }
     },
     testPassword () {
       var a = C.decryptPrivKey(this.password.testPassword, this.accountSelect.privKey)

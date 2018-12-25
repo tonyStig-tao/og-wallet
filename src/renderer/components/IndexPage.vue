@@ -1,10 +1,11 @@
 <template>
   <div id="wrapper">
-    <img id="logo" src="~@/assets/logo.png" alt="electron-vue">
+    <img id="logo" src="~@/assets/ann.png" alt="electron-vue">
+    <!-- <img id="logo" src="~@/assets/logo.png" alt="electron-vue"> -->
     <main v-if="isRouterAlive">
       <div class="left-side">
         <span class="title">
-          Welcome to Ola!
+          Welcome to Ola! An annchain.og wallet.
         </span>
         <!-- <system-information></system-information> -->
       </div>
@@ -17,10 +18,10 @@
           <el-button type="success" @click="goCreatAccount"  icon="el-icon-plus" round style="margin-top: 10px">creat account</el-button>
           <el-button type="success" @click="goImportAccount" icon="el-icon-download" round style="margin-top: 10px">Import account</el-button>
         </div>
-        <div class="doc" style="margin-top: 20px">
+        <div class="doc" style="margin-top: 15%">
           <div class="title alt">Other Documentation</div>
-          <el-button type="success" icon="icon iconfont icon-web" plain @click="open('http://www.annchain.io/')"> website</el-button>
-          <el-button type="success" icon="icon iconfont icon-github1" plain @click="open('https://github.com/annchain/OG')"> github</el-button>
+          <el-button type="success" icon="icon iconfont icon-web" plain @click="open('http://www.annchain.io/' )" style="margin-top: 10px"> website</el-button>
+          <el-button type="success" icon="icon iconfont icon-github1" plain @click="open('https://github.com/annchain/OG')" style="margin-top: 10px"> github</el-button>
         </div>
       </div>
     </main>
