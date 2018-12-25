@@ -272,11 +272,12 @@ import sqlite from '../db/db.js'
 import QRCode from 'qrcode'
 import VueAvatar from '@lossendae/vue-avatar'
 import OG from 'og-sdk'
+import config from '../config/config.js'
 
 var og = new OG()
 
 og.setProvider(
-  new OG.providers.HttpProvider('http://localhost:8000')
+  new OG.providers.HttpProvider(config.OG_RPC.HttpProvider)
 )
 
 export default {

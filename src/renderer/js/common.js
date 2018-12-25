@@ -5,12 +5,13 @@ const CryptoJS = require('crypto-js')
 const promise = require('bluebird')
 const pdfMake = require('pdfmake/build/pdfmake.js')
 const pdfFonts = require('pdfmake/build/vfs_fonts.js')
+const config = require('../config/config.js')
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 var og = new OG()
 
 og.setProvider(
-  new OG.providers.HttpProvider('http://localhost:8000')
+  new OG.providers.HttpProvider(config.OG_RPC.HttpProvider)
 )
 var C = {}
 
