@@ -1,5 +1,7 @@
 <template>
-  <body style="-webkit-app-region: drag">  
+  <body>
+    <div id="drag" style="-webkit-app-region: drag">
+    </div>
     <div id="app">
       <router-view></router-view>
     </div>
@@ -14,4 +16,9 @@
 
 <style>
   /* CSS */
+  #drag{
+    position: absolute;
+    height: 5%;
+    width: 100%;
+  }
 </style>

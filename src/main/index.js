@@ -23,10 +23,17 @@ function createWindow () {
     height: 680,
     useContentSize: true,
     width: 1400,
-    titleBarStyle: 'hiddenInset'
+    titleBarStyle: 'hiddenInset',
+    show: false
   })
 
   mainWindow.loadURL(winURL)
+  mainWindow.webContents.openDevTools()
+
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show()
+    mainWindow.focus()
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null

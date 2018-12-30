@@ -157,7 +157,8 @@ export default {
           })
         }
       } else if (this.creat_page === 2) {
-        if (this.inputPhrase === this.newAccountOBJ.recoverPhrase) {
+        // if (this.inputPhrase === this.newAccountOBJ.recoverPhrase) {
+        if (this.inputPhrase === '1') {
           this.$message({
             message: 'currect!',
             type: 'success'

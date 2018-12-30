@@ -323,6 +323,7 @@ export default {
   },
   created: function () {
     sqlite.query('SELECT * FROM usr').then((data) => {
+      console.log(data)
       this.accountList = data.data
       console.log(this.accountList)
     })
