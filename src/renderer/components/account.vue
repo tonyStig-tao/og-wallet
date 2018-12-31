@@ -29,7 +29,13 @@
         </el-popover>
       </div>
       </transition>
-      <div id="accountButton">
+      <p class="title alt" style="position:absolute;top:38%;left:45%" v-if="accountList.length == 0">HERE IS EMPTY</p>
+      <p class="title alt" style="position:absolute;top:41%;left:38%" v-if="accountList.length == 0">PLEASE CREAT OR IMPORT AN ACCOUNT</p>
+      <div id="accountButtonBIG" v-if="accountList.length == 0">
+        <el-button v-if="cardShow" type="success" @click="goCreatAccount"  icon="el-icon-plus" round>creat account</el-button>
+        <el-button v-if="cardShow" type="success" @click="goImportAccount" icon="el-icon-download" round style="margin-top: 10px">Import account</el-button>
+      </div>
+      <div id="accountButton" v-if="accountList.length">
         <el-button v-if="cardShow" type="success" @click="goCreatAccount"  icon="el-icon-plus" round>creat account</el-button>
         <el-button v-if="cardShow" type="success" @click="goImportAccount" icon="el-icon-download" round style="margin-top: 10px">Import account</el-button>
       </div>
@@ -205,6 +211,12 @@
     color: #2c3e51;
     font-weight: bold;
     font-family:"Arial";
+  }
+
+  #accountButtonBIG{
+    position: absolute;
+    top: 45%;
+    left: 36.5%;
   }
 
   #accountButton{

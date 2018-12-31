@@ -3,6 +3,29 @@
     <img id="logo" src="~@/assets/ann.png" alt="electron-vue">
     <!-- <img id="logo" src="~@/assets/logo.png" alt="electron-vue"> -->
     <main v-if="isRouterAlive">
+      <div id="networkStatusWords">
+        <div class="title alt" v-if="netWork_GREEN">NETWORK STATUS: {{nowLinkTo}}
+          <!-- <el-button type="text" size="medium">{{nowLinkTo}}</el-button> -->
+        </div>
+        <div class="title alt" v-if="netWork_RED">NETWORK STATUS: {{nowLinkTo}}</div>
+      </div>
+      <div id="networkStatus">
+        <el-button type="success" icon="el-icon-check" circle @click="networkStatus" v-if="netWork_GREEN" size="mini"></el-button>
+        <el-button type="danger" icon="el-icon-close" circle v-if="netWork_RED" size="mini"></el-button>
+        <!-- <el-progress type="circle" :percentage="100" status="success" :width="12" v-if="netWork_GREEN"></el-progress> -->
+        <!-- <el-progress type="circle" :percentage="100" status="exception" :width="12" v-if="netWork_RED"></el-progress> -->
+      </div>
+      <el-dialog
+        title="NODE INFO"
+        :visible.sync="dialogVisible"
+        width="78%"
+        :show-close="false">
+        <span>{{network_status}}</span>
+        <span slot="footer" class="dialog-footer">
+          <!-- <el-button @click="dialogVisible = false">取 消</el-button> -->
+          <el-button type="success" round @click="dialogVisible = false">ok</el-button>
+        </span>
+      </el-dialog>
       <div class="left-side">
         <span class="title">
           Welcome to Ola! An annchain.og wallet.
@@ -33,30 +56,55 @@
 
 <script>
   import SystemInformation from './IndexPage/SystemInformation'
-  // import C from '../js/common.js'
+  import C from '../js/common.js'
   import sqlite from '../db/db.js'
+  import config from '../config/config.js'
 
   var initPage = function () {
-    sqlite.query('SELECT * FROM usr').then(function (data) {
-      // console.log(data)
+    sqlite.createTable('CREATE TABLE  IF NOT EXISTS usr (account_name CHAR, account_hint CHAR, address CHAR PRIMARY KEY UNIQUE, pubKey CHAR UNIQUE, pubKey_raw CHAR UNIQUE, privKey CHAR UNIQUE, balance_OG DOUBLE DEFAULT (0))').then((data) => {
+      console.log(data)
+      return sqlite.createTable('CREATE TABLE  IF NOT EXISTS txHistory (txHash CHAR PRIMARY KEY UNIQUE, cStatus CHAR, cFrom CHAR, cTo CHAR, cAmount DOUBLE, ConfirmTime CHAR)')
+    }).then((data) => {
+      console.log(data)
+      return sqlite.query('SELECT * FROM usr')
+    }).then().catch((err) => {
+      console.log('err=', err)
     })
   }
-  // initPage()
 
   export default {
     name: 'index-page',
-    created: function () {
-      initPage()
-    },
     data () {
       return {
-        isRouterAlive: true
+        isRouterAlive: true,
+        netWork_RED: true,
+        netWork_GREEN: false,
+        nowLinkTo: '',
+        network_status: {},
+        dialogVisible: false
       }
+    },
+    created: function () {
+      C.getNetInfo().then((data) => {
+        console.log(data)
+        this.network_status = data
+        this.netWork_GREEN = true
+        this.netWork_RED = false
+        this.nowLinkTo = config.OG_RPC.HttpProvider
+      }).then().catch((err) => {
+        console.log(err)
+        this.netWork_GREEN = false
+        this.netWork_RED = true
+      })
+      initPage()
     },
     components: { SystemInformation },
     methods: {
       open (link) {
         this.$electron.shell.openExternal(link)
+      },
+      networkStatus () {
+        this.dialogVisible = true
       },
       goAccount () {
         this.$router.push({ path: '/account' })
@@ -99,6 +147,18 @@
     height: 100vh;
     padding: 60px 80px;
     width: 100vw;
+  }
+
+  #networkStatus{
+    position: absolute;
+    top:5%;
+    right:2%;
+  }
+
+  #networkStatusWords{
+    position: absolute;
+    top:5.3%;
+    right:4.5%;
   }
 
   #logo {

@@ -15,6 +15,10 @@ og.setProvider(
 )
 var C = {}
 
+C.getNetInfo = function () {
+  return og.net_info()
+}
+
 C.creatAccount = function () {
   return og.newAccount()
 }

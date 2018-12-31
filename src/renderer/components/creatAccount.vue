@@ -28,7 +28,7 @@
       </div>
       <div id="step2" v-show="creat_page == 1">
         <p class="title alt small">account</p>
-        <vue-avatar :username="newAccount.account_name"></vue-avatar>
+        <vue-avatar :username="newAccount.account_name || tag"></vue-avatar>
         <p class="title alt">{{newAccount.account_name}}</p>
         <p class="title alt small">address</p>
         <p class="title alt">{{newAccountOBJ.address}}</p>
@@ -114,6 +114,7 @@ export default {
   },
   data () {
     return {
+      tag: 'a',
       isRouterAlive: true,
       creat_page: 0,
       newAccount: {
