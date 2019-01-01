@@ -106,12 +106,17 @@ C.makeUpTransaction = function (txParams, signature) {
   return og.makeUpTransaction(txParams, signature)
 }
 
+C.updateTxStatus = function () {
+  console.log('a')
+}
+
 C.layoutPDF = function (type, data) {
   // eslint-disable-next-line eqeqeq
   if (type === 'secp') {
     var docDefinition = { content: [
       { text: 'OG ACCOUNT BACKUP CARD', style: 'header' }, '\n', '\n',
-      { text: 'OG account:', style: 'header' }, '\n', '\n',
+      { text: 'OG account:', style: 'header' },
+      data.address, '\n',
       { text: 'address:', style: 'header' },
       data.address, '\n',
       { text: 'privKey:', style: 'header' },

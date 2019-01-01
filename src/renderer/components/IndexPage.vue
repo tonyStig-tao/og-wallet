@@ -11,9 +11,7 @@
       </div>
       <div id="networkStatus">
         <el-button type="success" icon="el-icon-check" circle @click="networkStatus" v-if="netWork_GREEN" size="mini"></el-button>
-        <el-button type="danger" icon="el-icon-close" circle v-if="netWork_RED" size="mini"></el-button>
-        <!-- <el-progress type="circle" :percentage="100" status="success" :width="12" v-if="netWork_GREEN"></el-progress> -->
-        <!-- <el-progress type="circle" :percentage="100" status="exception" :width="12" v-if="netWork_RED"></el-progress> -->
+        <el-button type="danger" icon="el-icon-close" circle @click="networkStatus" v-if="netWork_RED" size="mini"></el-button>
       </div>
       <el-dialog
         title="NODE INFO"
@@ -22,7 +20,6 @@
         :show-close="false">
         <span>{{network_status}}</span>
         <span slot="footer" class="dialog-footer">
-          <!-- <el-button @click="dialogVisible = false">取 消</el-button> -->
           <el-button type="success" round @click="dialogVisible = false">ok</el-button>
         </span>
       </el-dialog>
@@ -43,7 +40,7 @@
         </div>
         <div class="doc" style="margin-top: 15%">
           <div class="title alt">Other Documentation</div>
-          <el-button type="success" icon="icon iconfont icon-web" plain @click="open('http://www.annchain.io/' )" style="margin-top: 10px"> website</el-button>
+          <el-button type="success" icon="icon iconfont icon-wangzhan" plain @click="open('http://www.annchain.io/' )" style="margin-top: 10px"> website</el-button>
           <el-button type="success" icon="icon iconfont icon-github1" plain @click="open('https://github.com/annchain/OG')" style="margin-top: 10px"> github</el-button>
         </div>
       </div>
@@ -80,7 +77,7 @@
         netWork_RED: true,
         netWork_GREEN: false,
         nowLinkTo: '',
-        network_status: {},
+        network_status: 'please check your connection',
         dialogVisible: false
       }
     },

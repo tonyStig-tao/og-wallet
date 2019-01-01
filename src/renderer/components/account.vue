@@ -186,7 +186,7 @@
         <div>back <el-button type="success" icon="icon iconfont icon-icon-" @click="goBack" circle></el-button></div>
       </div>
       <div id="menu-icon" v-if="!accountInfoShow">
-        <div>account <el-button type="success" icon="icon iconfont icon-jiaoyijilu" @click="goIndex" circle></el-button></div>
+        <div>account <el-button type="success" icon="icon iconfont icon-jiaoyijilu" @click="goContract" circle></el-button></div>
       </div>
   </div>
 </template>
@@ -344,6 +344,9 @@ export default {
     goIndex () {
       this.$router.push({ path: '/' })
     },
+    goContract () {
+      this.$router.push({ path: '/contract' })
+    },
     goCreatAccount () {
       this.$router.push({ path: '/creatAccount' })
     },
@@ -472,7 +475,6 @@ export default {
 
     },
     exportAccount () {
-      console.log(this.exportData.password, this.accountSelect.privKey)
       var a = C.decryptPrivKey(this.exportData.password, this.accountSelect.privKey)
       console.log(a)
       if (a === '') {
@@ -484,6 +486,7 @@ export default {
       } else {
         var type = 'secp'
         var data = {
+          name: this.accountSelect.account_name,
           address: this.accountSelect.address,
           secp_privKey: a,
           recoverPhrase: C.getRecoverPhrase(a)
@@ -492,7 +495,7 @@ export default {
         this.$notify({
           message: 'Account has been successfully exported!',
           type: 'success',
-          duration: 8000
+          duration: 40000
         })
         this.visible = false
       }

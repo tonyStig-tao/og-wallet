@@ -26,6 +26,16 @@ export default new Router({
       component: require('@/components/importAccount').default
     },
     {
+      path: '/contract',
+      name: 'contract-page',
+      component: require('@/components/contract').default
+    },
+    {
+      path: '/explor',
+      name: 'explor-page',
+      component: require('@/components/explor').default
+    },
+    {
       path: '*',
       redirect: '/'
     }
