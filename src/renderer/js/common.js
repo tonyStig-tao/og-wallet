@@ -116,7 +116,7 @@ C.layoutPDF = function (type, data) {
     var docDefinition = { content: [
       { text: 'OG ACCOUNT BACKUP CARD', style: 'header' }, '\n', '\n',
       { text: 'OG account:', style: 'header' },
-      data.address, '\n',
+      data.account_name, '\n',
       { text: 'address:', style: 'header' },
       data.address, '\n',
       { text: 'privKey:', style: 'header' },

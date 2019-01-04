@@ -2,10 +2,18 @@ var sqlite3 = require('sqlite3').verbose()
 var Promise = require('bluebird')
 var path = require('path')
 var { remote } = require('electron')
+var os = require('os')
 // eslint-disable-next-line no-path-concat
-console.log(path.join(remote.app.getPath('userData')))
-
-var db = new sqlite3.Database(path.join(remote.app.getPath('userData'), '/usr.db'), function (data) {
+// console.log(path.join(remote.app.getPath('userData')))
+console.log(os.homedir(), os.platform())
+var platform = os.platform()
+if (platform === 'darwin') {
+  var pathJoin = remote.app.getPath('userData')
+} else {
+  pathJoin = remote.app.getPath('appData')
+  // pathJoin = __dirname
+}
+var db = new sqlite3.Database(path.join(pathJoin, '/usr.db'), function (data) {
   // console.log(data)
 })
 
