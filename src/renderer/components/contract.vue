@@ -15,20 +15,16 @@
 
 <style>
   #accountWrapper {
-    background:
+    /* background:
       radial-gradient(
         ellipse at top left,
         rgba(255, 255, 255, 1) 40%,
         rgba(229, 229, 229, .9) 100%
-      );
+      ); */
+    background-image: url("~@/assets/background.png"); 
     height: 100vh;
     padding: 40px 40px;
     width: 100vw;
-  }
-
-  #stepPage {
-    padding: 1% 26%;
-    width:100%;
   }
 
   #modeSelecter { 
@@ -77,6 +73,12 @@ export default {
   },
   methods: {
     goIndex () {
+      this.$router.push({ path: '/' })
+    },
+    goCreatAccount () {
+      this.$router.push({ path: '/' })
+    },
+    goImportAccount () {
       this.$router.push({ path: '/' })
     }
   }

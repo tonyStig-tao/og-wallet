@@ -47,15 +47,16 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 680,
+    height: 750,
     useContentSize: true,
     width: 1400,
     titleBarStyle: 'hiddenInset',
-    show: false
+    show: false,
+    backgroundColor: '#cdece6'
   })
 
   mainWindow.loadURL(winURL)
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()

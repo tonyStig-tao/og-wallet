@@ -16,9 +16,9 @@ export default new Router({
       component: require('@/components/account').default
     },
     {
-      path: '/creatAccount',
-      name: 'creatAccount-page',
-      component: require('@/components/creatAccount').default
+      path: '/createAccount',
+      name: 'createAccount-page',
+      component: require('@/components/createAccount').default
     },
     {
       path: '/importAccount',
